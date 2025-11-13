@@ -76,18 +76,26 @@ categories.forEach(category => {
     const categorySpan = document.createElement("span");
     categorySpan.className = "category";
     categorySpan.textContent = category;
+    category === "All" && categorySpan.classList.add("active-category");
 
     categoriesContainer.append(categorySpan);
 });
 
 document.querySelectorAll(".category").forEach((categorySpan) => {
   categorySpan.addEventListener("click", () => {
-    currentCategory = categorySpan.textContent;
+    const category = categorySpan.textContent;
+    currentCategory = category;
+    
+    document.querySelectorAll(".category").forEach(ctg => {
+        ctg.classList.remove("active-category");
+    })
 
-    categorySpan.textContent === "All"
+    categorySpan.classList.add("active-category");
+
+    category === "All"
       ? displayProducts(data)
       : displayProducts(
-          data.filter((item) => item.category === categorySpan.textContent)
+          data.filter((item) => item.category === category)
         );
   });
 });
