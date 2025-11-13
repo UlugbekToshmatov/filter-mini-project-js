@@ -10,7 +10,7 @@ const data = [
     id: 11,
     name: "Invicta Men's Pro Diver 2",
     img: "https://m.media-amazon.com/images/I/71e04Q53xlL._AC_UY879_.jpg",
-    price: 74,
+    price: 150,
     category: "Dress",
   },
   {
@@ -38,7 +38,7 @@ const data = [
     id: 5,
     name: "Garmin Venu Smartwatch ",
     img: "https://m.media-amazon.com/images/I/51kyjYuOZhL._AC_SL1000_.jpg",
-    price: 74,
+    price: 100,
     category: "Casual",
   },
 ];
@@ -46,12 +46,32 @@ const data = [
 const categoriesContainer = document.querySelector(".categories");
 const priceRangeContainer = document.querySelector(".price-range");
 const productsContainer = document.querySelector(".products-page");
+const priceSpan = document.querySelector(".price");
 
 const searchBar = document.querySelector(".search-bar");
 const priceRangeBar = document.querySelector(".price-range-bar");
 
-// Initialize categories
-const categories = ["All", ...new Set(data.map(item => item.category))];
+let maxPrice = data[0].price;
+let minPrice = data[0].price;
+let currentCategory = "All";
+const categories = ["All"];
+
+data.forEach(item => {
+    !categories.includes(item.category) && categories.push(item.category);
+
+    if (item.price > maxPrice) {
+        maxPrice = item.price;
+    } else if (item.price < minPrice) {
+        minPrice = item.price;
+    }
+})
+
+priceRangeBar.max = maxPrice;
+priceRangeBar.min = minPrice;
+priceRangeBar.value = maxPrice;
+priceSpan.textContent = `$${maxPrice}`;
+let currentPrice = maxPrice;
+
 categories.forEach(category => {
     const categorySpan = document.createElement("span");
     categorySpan.className = "category";
@@ -60,25 +80,10 @@ categories.forEach(category => {
     categoriesContainer.append(categorySpan);
 });
 
-// Define a reusable function to render received products
-function displayProducts(filteredData) {
-    productsContainer.innerHTML = filteredData.map(item => (
-        `
-            <div class="product">
-                <img
-                    src=${item.img}
-                    alt=${item.name}
-                >
-                <span class="name">${item.name}</span>
-                <span class="price">$${item.price}</span>
-            </div>
-        `
-    )).join("");
-}
-
-// Listen to the category spans to show products by category
 document.querySelectorAll(".category").forEach((categorySpan) => {
   categorySpan.addEventListener("click", () => {
+    currentCategory = categorySpan.textContent;
+
     categorySpan.textContent === "All"
       ? displayProducts(data)
       : displayProducts(
@@ -87,11 +92,9 @@ document.querySelectorAll(".category").forEach((categorySpan) => {
   });
 });
 
-// Listen to the searchBar and priceRangeBar inputs to show products
-// by similar name and price
 searchBar.addEventListener("keyup", (e) => {
-    const input = e.target.value.toLowerCase();     // Event triggers whenever non-empty value is present
-    
+    const input = e.target.value.toLowerCase();     // 'keyup' event triggers whenever non-empty value
+                                                    // is present in the search bar
     if (input) {
         displayProducts(data.filter(item => (
             item.name.toLowerCase().includes(input)
@@ -100,5 +103,46 @@ searchBar.addEventListener("keyup", (e) => {
         displayProducts(data);
     }
 })
+
+priceRangeBar.addEventListener("input", (e) => {
+    const priceValue = Number(e.target.value);
+    priceSpan.textContent = priceValue;
+    currentPrice = priceValue;
+    displayProducts(data.filter(item => item.price <= priceValue));
+});
+
+function displayProducts(filteredData) {
+    if (currentCategory === "All"){
+        productsContainer.innerHTML = filteredData
+            .filter(item => item.price <= currentPrice)
+            .map(item => (
+                `
+                    <div class="product">
+                        <img
+                            src=${item.img}
+                            alt=${item.name}
+                        >
+                        <span class="name">${item.name}</span>
+                        <span class="price">$${item.price}</span>
+                    </div>
+                `
+            )).join("");
+    } else {
+        productsContainer.innerHTML = filteredData
+            .filter(item => item.price <= currentPrice && item.category === currentCategory)
+            .map(item => (
+                `
+                    <div class="product">
+                        <img
+                            src=${item.img}
+                            alt=${item.name}
+                        >
+                        <span class="name">${item.name}</span>
+                        <span class="price">$${item.price}</span>
+                    </div>
+                `
+            )).join("");
+    }
+}
 
 displayProducts(data);
