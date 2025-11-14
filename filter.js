@@ -51,10 +51,11 @@ const priceSpan = document.querySelector(".price");
 const searchBar = document.querySelector(".search-bar");
 const priceRangeBar = document.querySelector(".price-range-bar");
 
+const ALL_CATEGORIES = "All";
 let maxPrice = data[0].price;
 let minPrice = data[0].price;
-let currentCategory = "All";
-const categories = ["All"];
+let currentCategory = ALL_CATEGORIES;
+const categories = [ALL_CATEGORIES];
 
 data.forEach(item => {
     !categories.includes(item.category) && categories.push(item.category);
@@ -76,7 +77,7 @@ categories.forEach(category => {
     const categorySpan = document.createElement("span");
     categorySpan.className = "category";
     categorySpan.textContent = category;
-    category === "All" && categorySpan.classList.add("active-category");
+    category === ALL_CATEGORIES && categorySpan.classList.add("active-category");
 
     categoriesContainer.append(categorySpan);
 });
@@ -92,7 +93,7 @@ document.querySelectorAll(".category").forEach((categorySpan) => {
 
     categorySpan.classList.add("active-category");
 
-    category === "All"
+    category === ALL_CATEGORIES
       ? displayProducts(data)
       : displayProducts(
           data.filter((item) => item.category === category)
@@ -120,7 +121,7 @@ priceRangeBar.addEventListener("input", (e) => {
 });
 
 function displayProducts(filteredData) {
-    if (currentCategory === "All"){
+    if (currentCategory === ALL_CATEGORIES){
         productsContainer.innerHTML = filteredData
             .filter(item => item.price <= currentPrice)
             .map(item => (
