@@ -115,7 +115,7 @@ searchBar.addEventListener("keyup", (e) => {
 
 priceRangeBar.addEventListener("input", (e) => {
     const priceValue = Number(e.target.value);
-    priceSpan.textContent = priceValue;
+    priceSpan.textContent = `$${priceValue}`;
     currentPrice = priceValue;
     displayProducts(data.filter(item => item.price <= priceValue));
 });
